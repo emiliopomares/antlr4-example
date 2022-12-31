@@ -1,0 +1,9 @@
+A = 6
+DistSqr(1, Double(A))
+B = 14
+A
+Double(A)
+Triple(A)
+func DistSqr(X, Y) => X*X+Y*Y
+func Double(X) => X*2
+func Triple(X) => X*3
