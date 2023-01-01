@@ -31,6 +31,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitExpr_assign_stmt(calcWithFunctionsParser::Expr_assign_stmtContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitFunction_definition(calcWithFunctionsParser::Function_definitionContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -44,10 +48,6 @@ public:
   }
 
   virtual std::any visitExpr_variable_eval(calcWithFunctionsParser::Expr_variable_evalContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual std::any visitExpr_assign_eval(calcWithFunctionsParser::Expr_assign_evalContext *ctx) override {
     return visitChildren(ctx);
   }
 

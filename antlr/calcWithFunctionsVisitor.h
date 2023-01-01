@@ -27,6 +27,8 @@ public:
 
     virtual std::any visitDefine_function_stmt(calcWithFunctionsParser::Define_function_stmtContext *context) = 0;
 
+    virtual std::any visitExpr_assign_stmt(calcWithFunctionsParser::Expr_assign_stmtContext *context) = 0;
+
     virtual std::any visitFunction_definition(calcWithFunctionsParser::Function_definitionContext *context) = 0;
 
     virtual std::any visitConstant(calcWithFunctionsParser::ConstantContext *context) = 0;
@@ -34,8 +36,6 @@ public:
     virtual std::any visitVariable(calcWithFunctionsParser::VariableContext *context) = 0;
 
     virtual std::any visitExpr_variable_eval(calcWithFunctionsParser::Expr_variable_evalContext *context) = 0;
-
-    virtual std::any visitExpr_assign_eval(calcWithFunctionsParser::Expr_assign_evalContext *context) = 0;
 
     virtual std::any visitExpr_sub_eval(calcWithFunctionsParser::Expr_sub_evalContext *context) = 0;
 

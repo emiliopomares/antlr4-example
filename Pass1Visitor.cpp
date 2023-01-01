@@ -21,6 +21,11 @@ std::any Pass1Visitor::visitEvaluate_expression_stmt(calcWithFunctionsParser::Ev
 	return nullptr;
 }
 
+std::any Pass1Visitor::visitExpr_assign_stmt(calcWithFunctionsParser::Expr_assign_stmtContext *ctx)
+{
+	return nullptr;
+}
+
 std::any Pass1Visitor::visitFunction_definition(calcWithFunctionsParser::Function_definitionContext *ctx) 
 {
 	std::string functionName = ctx->children[1]->getText();

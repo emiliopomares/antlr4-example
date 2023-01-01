@@ -1,7 +1,10 @@
 A = 6
 DistSqr(1, Double(A))
 B = 14
+B + 0
 A
+F = 5
+D = F
 Double(A)
 Triple(A)
 Hexaple(A)

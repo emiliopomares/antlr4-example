@@ -19,6 +19,7 @@ statement:
 	NEWLINE								# ignore
 	| expression NEWLINE				# evaluate_expression_stmt
 	| function_definition NEWLINE		# define_function_stmt
+	| variable '=' expression NEWLINE	# expr_assign_stmt
 	;
 
 function_definition:
@@ -42,7 +43,6 @@ expression:
 	| expression '-' expression				# expr_sub_eval
 	| '(' expression ')'					# expr_parenthesis_eval
 	| ID '(' params_values_list ')'			# expr_function_call_eval
-	| variable '=' expression				# expr_assign_eval
 	;
 
 params_names_list:

@@ -23,19 +23,7 @@ std::any Pass2Visitor::visitDefine_function_stmt(calcWithFunctionsParser::Define
 	return visitChildren(ctx);
 }
 
-std::any Pass2Visitor::visitExpr_variable_eval(calcWithFunctionsParser::Expr_variable_evalContext *ctx)
-{
-	Expression newExpression(symbolTable, 0.0);
-	std::string varName = ctx->getText();
-	Variable* var = symbolTable->findVariable(varName, symbolTable->getCurrentScope());
-	if(var == nullptr) {
-		return newExpression;
-	}
-	newExpression.setVariable(var);
-	return newExpression;
-}
-
-std::any Pass2Visitor::visitExpr_assign_eval(calcWithFunctionsParser::Expr_assign_evalContext *ctx) 
+std::any Pass2Visitor::visitExpr_assign_stmt(calcWithFunctionsParser::Expr_assign_stmtContext *ctx) 
 {
 	Expression newExpression(symbolTable, 0.0);
 	std::string currentScope = symbolTable->getCurrentScope();
@@ -49,8 +37,20 @@ std::any Pass2Visitor::visitExpr_assign_eval(calcWithFunctionsParser::Expr_assig
 	Expression expression = std::any_cast<Expression>(visit(ctx->children[2]));
 	double value = expression.evaluate();
 	var->setValue(value);
+	std::cout << "[" << resultCounter << "] - " << varName << " <- " << value << " \n";
+	resultCounter++;
+	return nullptr;
+}
+
+std::any Pass2Visitor::visitExpr_variable_eval(calcWithFunctionsParser::Expr_variable_evalContext *ctx)
+{
+	Expression newExpression(symbolTable, 0.0);
+	std::string varName = ctx->getText();
+	Variable* var = symbolTable->findVariable(varName, symbolTable->getCurrentScope());
+	if(var == nullptr) {
+		return newExpression;
+	}
 	newExpression.setVariable(var);
-	newExpression.valid = expression.valid;
 	return newExpression;
 }
 

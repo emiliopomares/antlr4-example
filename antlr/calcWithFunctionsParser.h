@@ -74,6 +74,17 @@ public:
    
   };
 
+  class  Expr_assign_stmtContext : public StatementContext {
+  public:
+    Expr_assign_stmtContext(StatementContext *ctx);
+
+    VariableContext *variable();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *NEWLINE();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  IgnoreContext : public StatementContext {
   public:
     IgnoreContext(StatementContext *ctx);
@@ -165,16 +176,6 @@ public:
     Expr_variable_evalContext(ExpressionContext *ctx);
 
     VariableContext *variable();
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Expr_assign_evalContext : public ExpressionContext {
-  public:
-    Expr_assign_evalContext(ExpressionContext *ctx);
-
-    VariableContext *variable();
-    ExpressionContext *expression();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
