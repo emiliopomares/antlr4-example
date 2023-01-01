@@ -7,7 +7,7 @@ antlr_files_dir = ./antlr
 antlr_options = -visitor -no-listener -o $(antlr_files_dir)
 
 cc = clang++
-cflags = -std=c++20 -Wc++11-extensions
+cflags = -std=c++20
 libs = -lantlr4-runtime
 
 antlr_files = $(prefix).interp $(prefix).tokens\
@@ -28,6 +28,9 @@ Pass1Visitor.o: Pass1Visitor.cpp
 
 Pass2Visitor.o: Pass1Visitor.cpp
 	$(cc) -c $(cflags) Pass2Visitor.cpp
+
+SymbolTable.o: SymbolTable.cpp
+	$(cc) -c $(cflags) SymbolTable.cpp
 
 Main.o: Main.cpp
 	$(cc) -c $(cflags) Main.cpp

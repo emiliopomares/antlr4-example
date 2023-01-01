@@ -1,0 +1,9 @@
+D = Triple(2)
+Quad(1)
+Oct(1)
+OctPlusTriple(1)
+Quad(D)
+func Triple(Y) => 3*Y
+func Quad(X) => X+Triple(X)
+func Oct(X) => 2*Quad(X)
+func OctPlusTriple(W) => Oct(W) + Triple(W)

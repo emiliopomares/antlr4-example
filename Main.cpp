@@ -25,7 +25,12 @@ int main(int argc, char **argv)
 
 	tree::ParseTree *tree = parser.program();
         Pass1Visitor pass1_visitor(&symbolTable);
-	pass1_visitor.visit(tree);
+	bool passOk = false;
+        
+        while(!passOk)
+        {        
+                passOk = std::any_cast<bool>(pass1_visitor.visit(tree));
+        }
 
 	Pass2Visitor pass2_visitor(&symbolTable);
         pass2_visitor.visit(tree);

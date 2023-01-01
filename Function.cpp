@@ -13,9 +13,31 @@ Function::Function(std::string name, std::vector<std::string> param_names, Expre
 	this->symbolTable = symbolTable;
 }
 
+void Function::setParamValues(std::string scope, std::vector<Expression> param_values)
+{
+	this->param_values[scope].clear();
+	for(auto expr : param_values)
+	{
+		this->param_values[scope].push_back(expr);
+	}
+}
+
+std::vector<Expression>* Function::getParamValues(std::string scope)
+{
+	return &param_values[scope];
+}
+
 double Function::call()
 {
-	return expression->evaluate();
+	symbolTable->startScope(name);
+	double result = expression->evaluate();
+	symbolTable->endScope();
+	return result;
+}
+
+std::string Function::getName()
+{
+	return name;
 }
 
 std::vector<std::string>* Function::getParamNames()

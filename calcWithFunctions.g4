@@ -12,11 +12,12 @@ WS: (' ' | '\t' )+ -> skip;
 // Rules
 
 program:
-	statement* EOF
+	statement*
 	;
 
 statement:
-	  expression NEWLINE				# evaluate_expression_stmt
+	NEWLINE								# ignore
+	| expression NEWLINE				# evaluate_expression_stmt
 	| function_definition NEWLINE		# define_function_stmt
 	;
 

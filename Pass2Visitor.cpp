@@ -1,17 +1,20 @@
 #include "Pass2Visitor.h"
+#include "Exceptions.h"
 #include <iostream>
 #include <vector>
 
 Pass2Visitor::Pass2Visitor(SymbolTable* symbolTable) : calcWithFunctionsBaseVisitor()
 {
 	this->symbolTable = symbolTable;
+	resultCounter = 1;
 }
 
 std::any Pass2Visitor::visitEvaluate_expression_stmt(calcWithFunctionsParser::Evaluate_expression_stmtContext *ctx)
 {
 	Expression expression = std::any_cast<Expression>(visit(ctx->children[0]));
-	double value = expression.evaluate(); 
-	std::cout << "RESULT: " << value << " \n";
+	double value = expression.evaluate();
+	std::cout << "[" << resultCounter << "] - " << value << " \n";
+	++resultCounter;
 	return nullptr;
 }
 
@@ -22,19 +25,19 @@ std::any Pass2Visitor::visitDefine_function_stmt(calcWithFunctionsParser::Define
 
 std::any Pass2Visitor::visitExpr_variable_eval(calcWithFunctionsParser::Expr_variable_evalContext *ctx)
 {
+	Expression newExpression(symbolTable, 0.0);
 	std::string varName = ctx->getText();
 	Variable* var = symbolTable->findVariable(varName, symbolTable->getCurrentScope());
 	if(var == nullptr) {
-		std::cout << " Variable " << varName << " not found, defaulting to 0 \n"; 
-		return Expression(0.0);
+		return newExpression;
 	}
-	Expression newExpression(var);
+	newExpression.setVariable(var);
 	return newExpression;
 }
 
 std::any Pass2Visitor::visitExpr_assign_eval(calcWithFunctionsParser::Expr_assign_evalContext *ctx) 
 {
-	Expression newExpression(0.0);
+	Expression newExpression(symbolTable, 0.0);
 	std::string currentScope = symbolTable->getCurrentScope();
 	std::string varName = ctx->children[0]->getText();
 	Variable* var = symbolTable->findVariable(varName, symbolTable->getCurrentScope());
@@ -47,6 +50,7 @@ std::any Pass2Visitor::visitExpr_assign_eval(calcWithFunctionsParser::Expr_assig
 	double value = expression.evaluate();
 	var->setValue(value);
 	newExpression.setVariable(var);
+	newExpression.valid = expression.valid;
 	return newExpression;
 }
 
@@ -54,45 +58,32 @@ std::any Pass2Visitor::visitExpr_sub_eval(calcWithFunctionsParser::Expr_sub_eval
 {
 	Expression lvalue = std::any_cast<Expression>(visit(ctx->children[0]));
 	Expression rvalue = std::any_cast<Expression>(visit(ctx->children[2]));
-	Expression newExpression(&lvalue, &rvalue, "-");
+	Expression newExpression(symbolTable, &lvalue, &rvalue, "-");
 	return newExpression;
 }
 
 std::any Pass2Visitor::visitExpr_constant_eval(calcWithFunctionsParser::Expr_constant_evalContext *ctx)
 {
-	Expression newExpression(atof(ctx->getText().c_str()));
+	Expression newExpression(symbolTable, atof(ctx->getText().c_str()));
 	return newExpression;
 }
 
 std::any Pass2Visitor::visitExpr_function_call_eval(calcWithFunctionsParser::Expr_function_call_evalContext *ctx)
 {
-	Expression newExpression(0.0);
+	Expression newExpression(symbolTable, 0.0);
 	
 	std::string funcName = ctx->children[0]->getText();
 	Function* function = symbolTable->findFunction(funcName);
 	if(function==nullptr) {
-		std::cout << "Error: function " << funcName << " not found \n";
-		exit(-1);
-		return nullptr;	
+		newExpression.setConstant(0.0);
+		newExpression.valid = false;
+		return newExpression;
 	}
-	
-	std::vector<std::string> *param_names = function->getParamNames();
 	
 	std::vector<Expression> values = std::any_cast<std::vector<Expression>>(visit(ctx->children[2]));
+	function->setParamValues(symbolTable->getCurrentScope(), values);
 
-	for(int i = 0 ; i < values.size() ; ++i)
-	{
-		Variable* var = symbolTable->findVariable((*param_names)[i], funcName);
-		if(var == nullptr) {
-			
-			exit(-1);
-		}
-		
-		var->setValue(values[i].evaluate());
-	}
-	
-	double result = function->call();
-	newExpression.setConstant(result);
+	newExpression.setFunction(function);
 	return newExpression;
 }
 
@@ -100,21 +91,21 @@ std::any Pass2Visitor::visitExpr_add_eval(calcWithFunctionsParser::Expr_add_eval
 {
 	Expression lvalue = std::any_cast<Expression>(visit(ctx->children[0]));
 	Expression rvalue = std::any_cast<Expression>(visit(ctx->children[2]));
-	Expression newExpression(&lvalue, &rvalue, "+");
+	Expression newExpression(symbolTable, &lvalue, &rvalue, "+");
 	return newExpression;
 }
 std::any Pass2Visitor::visitExpr_mul_eval(calcWithFunctionsParser::Expr_mul_evalContext *ctx)
 {
 	Expression lvalue = std::any_cast<Expression>(visit(ctx->children[0]));
 	Expression rvalue = std::any_cast<Expression>(visit(ctx->children[2]));
-	Expression newExpression(&lvalue, &rvalue, "*");
+	Expression newExpression(symbolTable, &lvalue, &rvalue, "*");
 	return newExpression;
 }
 std::any Pass2Visitor::visitExpr_div_eval(calcWithFunctionsParser::Expr_div_evalContext *ctx)
 {
 	Expression lvalue = std::any_cast<Expression>(visit(ctx->children[0]));
 	Expression rvalue = std::any_cast<Expression>(visit(ctx->children[2]));
-	Expression newExpression(&lvalue, &rvalue, "/");
+	Expression newExpression(symbolTable, &lvalue, &rvalue, "/");
 	return newExpression;
 }
 std::any Pass2Visitor::visitExpr_parenthesis_eval(calcWithFunctionsParser::Expr_parenthesis_evalContext *ctx)
@@ -157,7 +148,6 @@ std::any Pass2Visitor::visitParams_values_single(calcWithFunctionsParser::Params
 
 std::any Pass2Visitor::visitParams_values_multiple(calcWithFunctionsParser::Params_values_multipleContext *ctx)
 {
-	//std::cout << " 		--  A PARAM VALUE LIST ...  \n";
 	std::vector<Expression> values;
 	std::vector<Expression> childrenValues = std::any_cast<std::vector<Expression>>(visit(ctx->children[0]));
 	Expression singleValue = std::any_cast<Expression>(visit(ctx->children[2]));

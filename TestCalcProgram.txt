@@ -4,6 +4,9 @@ B = 14
 A
 Double(A)
 Triple(A)
+Hexaple(A)
+func Triple(X) => X*3
+func Hexaple(X) => 2*Triple(X)
 func DistSqr(X, Y) => X*X+Y*Y
 func Double(X) => X*2
-func Triple(X) => X*3
+

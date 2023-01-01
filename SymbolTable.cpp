@@ -1,4 +1,5 @@
 #include "SymbolTable.h"
+#include <iostream>
 
 void SymbolTable::addFunction(std::string name, Function* function)
 {

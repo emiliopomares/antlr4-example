@@ -7,6 +7,7 @@ class Pass2Visitor : public calcWithFunctionsBaseVisitor
 {
 	protected:
 		SymbolTable* symbolTable;
+		int resultCounter;
 	public:
 		Pass2Visitor(SymbolTable* symbolTable);
 		std::any visitEvaluate_expression_stmt(calcWithFunctionsParser::Evaluate_expression_stmtContext *context) override;
